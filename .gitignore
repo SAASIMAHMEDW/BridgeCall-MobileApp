@@ -73,3 +73,7 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Firebase config files (contains API keys and project info)
+android/app/google-services.json
+ios/GoogleService-Info.plist

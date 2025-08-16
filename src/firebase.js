@@ -4,5 +4,5 @@ import { getAuth } from '@react-native-firebase/auth';
 
 // Export the initialized services
 export const app = getApp();
-export const firestore = getFirestore(app);
+export const db = getFirestore(app);
 export const auth = getAuth(app);
