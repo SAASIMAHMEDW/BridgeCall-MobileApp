@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1034065985424",
+    "project_id": "bridgecall---web-mobile",
+    "storage_bucket": "bridgecall---web-mobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1034065985424:android:4be0c3416a953635047d15",
+        "android_client_info": {
+          "package_name": "com.bridgecallmobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAms3JvX4b0jLilGbw997OEt9z1Z_uqopg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
