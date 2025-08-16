@@ -8,6 +8,7 @@ import {
   collection,
   where,
   updateDoc,
+  arrayUnion,
 } from '@react-native-firebase/firestore';
 
 class Firestore {
@@ -85,6 +86,9 @@ class Firestore {
     return onSnapshot(callsQuery, (querySnapshot) => {
       cb(querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
     });
+  }
+  arrayUnion(element) {
+    return arrayUnion(element);
   }
 }
 

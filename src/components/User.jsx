@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { firestore } from '../db/firestore';
 import { useAuth } from '../hooks/auth/useAuth';
+import { useFocusEffect } from '@react-navigation/native';
 
 const User = ({ statusFilter, searchTerm, navigation }) => {
   const [users, setUsers] = useState([]);
@@ -16,6 +17,12 @@ const User = ({ statusFilter, searchTerm, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [callingUser, setCallingUser] = useState(null);
   const { user: currentUser } = useAuth();
+
+  useFocusEffect(
+  React.useCallback(() => {
+    setCallingUser(null);
+  }, [])
+);
 
   // Subscribe to users collection
   useEffect(() => {

@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  SafeAreaView,
   StatusBar,
 } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../hooks/auth/useAuth';
 import { firestore } from '../db/firestore';
 import User from '../components/User';
@@ -25,7 +25,7 @@ const HomeScreen = ({ navigation }) => {
   // Listen for incoming calls
   useEffect(() => {
     if (!user) return;
-    const unsubscribe = firestore.listenIncomingCalls(user.uid, (calls) => {
+    const unsubscribe = firestore.listenIncomingCalls(user.uid, calls => {
       if (calls.length > 0) {
         setIncomingCall(calls[0]);
         setIncomingModal(true);
@@ -60,7 +60,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
-      
+
       {/* Background Circles */}
       <View style={styles.backgroundCircle1} />
       <View style={styles.backgroundCircle2} />
@@ -82,13 +82,15 @@ const HomeScreen = ({ navigation }) => {
         </View>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <View style={styles.content}>
         {/* Welcome Section */}
         <View style={styles.welcomeSection}>
           <Text style={styles.title}>
             Welcome, {user?.displayName || 'User'}!
           </Text>
-          <Text style={styles.subtitle}>Connect with users around the world</Text>
+          <Text style={styles.subtitle}>
+            Connect with users around the world
+          </Text>
         </View>
 
         {/* Search Bar */}
@@ -111,13 +113,13 @@ const HomeScreen = ({ navigation }) => {
           setStatusFilter={setStatusFilter}
         />
 
-        {/* Users List */}
+        {/* Users List - Remove from ScrollView */}
         <User
           statusFilter={statusFilter}
           searchTerm={searchTerm}
           navigation={navigation}
         />
-      </ScrollView>
+      </View>
 
       {/* Incoming Call Modal */}
       <IncomingCall
