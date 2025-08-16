@@ -1,20 +1,19 @@
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, onSnapshot } from '@react-native-firebase/firestore';
+import { collection, onSnapshot } from '@react-native-firebase/firestore';
+import { firestore } from './firebase';
 
 const Test = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const db = getFirestore();
-    
     const unsubscribe = onSnapshot(
-      collection(db, 'users'),
+      collection(firestore, 'users'),
       snapshot => {
         const userList = snapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         }));
         setUsers(userList);
         setLoading(false);
@@ -22,7 +21,7 @@ const Test = () => {
       error => {
         console.error('Error fetching users:', error);
         setLoading(false);
-      }
+      },
     );
 
     return () => unsubscribe();
@@ -35,9 +34,14 @@ const Test = () => {
         <Text style={styles.email}>{item.email || 'No Email'}</Text>
         <View style={styles.statusContainer}>
           <Text style={styles.statusLabel}>Status: </Text>
-          <Text style={[styles.status, 
-            item.status === 'active' ? styles.activeStatus : styles.inactiveStatus
-          ]}>
+          <Text
+            style={[
+              styles.status,
+              item.status === 'active'
+                ? styles.activeStatus
+                : styles.inactiveStatus,
+            ]}
+          >
             {item.status || 'Unknown'}
           </Text>
         </View>
