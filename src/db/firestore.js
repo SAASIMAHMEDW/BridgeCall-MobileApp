@@ -22,7 +22,7 @@ class Firestore {
           lastSeen: serverTimestamp(),
           ...data,
         },
-        { merge: true }
+        { merge: true },
       );
     } catch (err) {
       console.error('Error saving user to Firestore:', err);
@@ -38,7 +38,7 @@ class Firestore {
           ...data,
           lastSeen: serverTimestamp(),
         },
-        { merge: true }
+        { merge: true },
       );
     } catch (err) {
       console.error('Error updating user in Firestore:', err);
@@ -48,9 +48,9 @@ class Firestore {
 
   subscribeToUsers(callback) {
     const q = query(collection(db, 'users'));
-    return onSnapshot(q, (querySnapshot) => {
+    return onSnapshot(q, querySnapshot => {
       const users = [];
-      querySnapshot.forEach((doc) => {
+      querySnapshot.forEach(doc => {
         users.push({ id: doc.id, ...doc.data() });
       });
       callback(users);
@@ -72,20 +72,35 @@ class Firestore {
   }
 
   listenToCall(callId, cb) {
-    return onSnapshot(doc(db, 'calls', callId), (snap) => {
+    return onSnapshot(doc(db, 'calls', callId), snap => {
       cb(snap.exists() ? snap.data() : null);
     });
   }
 
-  listenIncomingCalls(myUid, cb) {
-    const callsQuery = query(
-      collection(db, 'calls'),
-      where('calleeId', '==', myUid),
-      where('status', '==', 'initiated')
+  listenIncomingCalls(userId, callback) {
+    const callsRef = collection(db, 'calls');
+    const q = query(
+      callsRef,
+      where('calleeId', '==', userId),
+      where('status', '==', 'initiated'),
     );
-    return onSnapshot(callsQuery, (querySnapshot) => {
-      cb(querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+
+    this._incomingCallUnsubscribe = onSnapshot(q, snapshot => {
+      const calls = [];
+      snapshot.forEach(doc => {
+        calls.push({ id: doc.id, ...doc.data() });
+      });
+      callback(calls);
     });
+
+    return this._incomingCallUnsubscribe;
+  }
+  
+  clearIncomingCallListener(userId) {
+    if (this._incomingCallUnsubscribe) {
+      this._incomingCallUnsubscribe();
+      this._incomingCallUnsubscribe = null;
+    }
   }
   arrayUnion(element) {
     return arrayUnion(element);

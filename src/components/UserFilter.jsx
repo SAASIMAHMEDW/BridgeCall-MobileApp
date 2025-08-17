@@ -7,7 +7,7 @@ const UserFilter = ({ statusFilter, setStatusFilter }) => {
     { value: 'online', label: 'Online', color: '#10B981' },
     { value: 'offline', label: 'Offline', color: '#6B7280' },
     { value: 'incall', label: 'In Call', color: '#F59E0B' },
-    { value: 'callinitiated', label: 'Call Initiated', color: '#3B82F6' },
+    // { value: 'callinitiated', label: 'Call Initiated', color: '#3B82F6' },
   ];
 
   return (

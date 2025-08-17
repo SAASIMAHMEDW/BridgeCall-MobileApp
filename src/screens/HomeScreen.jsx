@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { firestore } from '../db/firestore';
 import User from '../components/User';
 import UserFilter from '../components/UserFilter';
 import IncomingCall from '../components/IncomingCall';
+import { useFocusEffect } from '@react-navigation/native';
 
 const HomeScreen = ({ navigation }) => {
   const { user, logout } = useAuth();
@@ -37,6 +38,25 @@ const HomeScreen = ({ navigation }) => {
     return unsubscribe;
   }, [user]);
 
+  useFocusEffect(
+    useCallback(() => {
+      if (!user) return;
+
+      // Restart incoming call listener when screen comes into focus
+      const unsubscribe = firestore.listenIncomingCalls(user.uid, calls => {
+        if (calls.length > 0) {
+          setIncomingCall(calls[0]);
+          setIncomingModal(true);
+        } else {
+          setIncomingCall(null);
+          setIncomingModal(false);
+        }
+      });
+
+      return unsubscribe;
+    }, [user]),
+  );
+
   const handleAcceptCall = async () => {
     setIncomingModal(false);
     navigation.navigate('Call', { callId: incomingCall.id });
@@ -51,7 +71,7 @@ const HomeScreen = ({ navigation }) => {
     try {
       await firestore.updateUser(user.uid, { status: 'offline' });
       await logout();
-      navigation.replace('Login');
+      // navigation.replace('Login');
     } catch (error) {
       console.error('Error signing out:', error);
     }

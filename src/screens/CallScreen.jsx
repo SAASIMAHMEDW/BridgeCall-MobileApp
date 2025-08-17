@@ -43,6 +43,11 @@ const CallScreen = ({ route, navigation }) => {
     return unsubscribe;
   }, [callId]);
 
+  useEffect(() => {
+  // Stop listening to incoming calls when in call screen
+  return firestore.clearIncomingCallListener?.(user?.uid);
+}, [user]);
+
   // WebRTC setup and signaling
   useEffect(() => {
     if (!callData || !user || cleanupRef.current) {

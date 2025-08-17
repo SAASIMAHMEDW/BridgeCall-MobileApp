@@ -14,6 +14,7 @@ import {
 import { useAuth } from '../hooks/auth/useAuth';
 import { firestore } from '../db/firestore';
 
+
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
