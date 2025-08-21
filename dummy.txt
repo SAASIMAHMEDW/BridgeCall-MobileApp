@@ -1,8 +1,10 @@
 cd android
-gradlew clean
+.\gradlew clean
 cd ..
 npm run android
 
+cd .\android\
+.\gradlew assembleRelease
 
 
 Then, in your module (app-level) build.gradle file, add both the google-services plug-in and any Firebase SDKs that you want to use in your app:
