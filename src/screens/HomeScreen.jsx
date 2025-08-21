@@ -18,7 +18,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 const HomeScreen = ({ navigation }) => {
   const { user, logout } = useAuth();
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('online');
   const [searchTerm, setSearchTerm] = useState('');
   const [incomingCall, setIncomingCall] = useState(null);
   const [incomingModal, setIncomingModal] = useState(false);
@@ -102,6 +102,7 @@ const HomeScreen = ({ navigation }) => {
         </View>
       </View>
 
+      <ScrollView style={{flex: 1}}>
       <View style={styles.content}>
         {/* Welcome Section */}
         <View style={styles.welcomeSection}>
@@ -140,6 +141,7 @@ const HomeScreen = ({ navigation }) => {
           navigation={navigation}
         />
       </View>
+      </ScrollView>
 
       {/* Incoming Call Modal */}
       <IncomingCall

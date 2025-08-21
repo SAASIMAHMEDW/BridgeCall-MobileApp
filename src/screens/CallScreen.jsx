@@ -25,6 +25,7 @@ const CallScreen = ({ route, navigation }) => {
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
   const [answerProcessed, setAnswerProcessed] = useState(false);
+  const [webrtcInitialized, setWebrtcInitialized] = useState(false);
   const cleanupRef = useRef(false);
 
   // Listen for call doc changes
@@ -50,7 +51,7 @@ const CallScreen = ({ route, navigation }) => {
 
   // WebRTC setup and signaling
   useEffect(() => {
-    if (!callData || !user || cleanupRef.current) {
+    if (!callData || !user || cleanupRef.current || webrtcInitialized) {
       console.log('Waiting for callData and user...', {
         callData: !!callData,
         user: !!user,
@@ -67,6 +68,7 @@ const CallScreen = ({ route, navigation }) => {
       'User role:',
       user.uid === callData.callerId ? 'CALLER' : 'CALLEE',
     );
+    setWebrtcInitialized(true);
 
     const startWebRTC = async () => {
       try {
@@ -257,7 +259,7 @@ const CallScreen = ({ route, navigation }) => {
     };
 
     startWebRTC();
-  }, [callData, user, callId, error, isInitialized]);
+  }, [callData, user, callId, error, isInitialized,webrtcInitialized]);
 
   // Handle new ICE candidates from Firestore
   useEffect(() => {
@@ -335,6 +337,7 @@ const CallScreen = ({ route, navigation }) => {
   useEffect(() => {
     return () => {
       console.log('Cleaning up WebRTC...');
+      setWebrtcInitialized(false);
       cleanupRef.current = true;
       webrtc.close();
     };

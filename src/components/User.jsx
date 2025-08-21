@@ -19,15 +19,15 @@ const User = ({ statusFilter, searchTerm, navigation }) => {
   const { user: currentUser } = useAuth();
 
   useFocusEffect(
-  React.useCallback(() => {
-    setCallingUser(null);
-  }, [])
-);
+    React.useCallback(() => {
+      setCallingUser(null);
+    }, []),
+  );
 
   // Subscribe to users collection
   useEffect(() => {
-    const unsubscribe = firestore.subscribeToUsers((usersData) => {
-      const otherUsers = usersData.filter((u) => u.id !== currentUser?.uid);
+    const unsubscribe = firestore.subscribeToUsers(usersData => {
+      const otherUsers = usersData.filter(u => u.id !== currentUser?.uid);
       setUsers(otherUsers);
       setLoading(false);
     });
@@ -40,22 +40,23 @@ const User = ({ statusFilter, searchTerm, navigation }) => {
     let filtered = [...users];
 
     if (statusFilter && statusFilter !== 'all') {
-      filtered = filtered.filter((user) => user.status === statusFilter);
+      filtered = filtered.filter(user => user.status === statusFilter);
     }
 
     if (searchTerm.trim()) {
       filtered = filtered.filter(
-        (user) =>
+        user =>
           user.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.name?.toLowerCase().includes(searchTerm.toLowerCase())
+          user.name?.toLowerCase().includes(searchTerm.toLowerCase()),
       );
     }
 
     setFilteredUsers(filtered);
+    // console.log(filtered);
   }, [users, statusFilter, searchTerm]);
 
   // Handle call button click
-  const handleCallClick = async (targetUser) => {
+  const handleCallClick = async targetUser => {
     if (!currentUser || targetUser.status !== 'online') return;
 
     try {
@@ -70,7 +71,8 @@ const User = ({ statusFilter, searchTerm, navigation }) => {
         callerId: currentUser.uid,
         calleeId: targetUser.id,
         callerName: currentUser.displayName || currentUser.email,
-        calleeName: targetUser.displayName || targetUser.name || targetUser.email,
+        calleeName:
+          targetUser.displayName || targetUser.name || targetUser.email,
         status: 'initiated',
       });
 
@@ -82,23 +84,58 @@ const User = ({ statusFilter, searchTerm, navigation }) => {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = status => {
     switch (status) {
-      case 'online': return '#10B981'; // green-500
-      case 'offline': return '#6B7280'; // gray-500  
-      case 'incall': return '#F59E0B'; // yellow-400
-      case 'callinitiated': return '#3B82F6'; // blue-400
-      default: return '#9CA3AF'; // gray-400
+      case 'online':
+        return '#10B981'; // green-500
+      case 'offline':
+        return '#6B7280'; // gray-500
+      case 'incall':
+        return '#F59E0B'; // yellow-400
+      case 'callinitiated':
+        return '#3B82F6'; // blue-400
+      default:
+        return '#9CA3AF'; // gray-400
     }
   };
 
-  const getStatusTextColor = (status) => {
+  const getStatusTextColor = status => {
     switch (status) {
-      case 'online': return '#000';
-      case 'offline': return '#fff';
-      case 'incall': return '#000';
-      case 'callinitiated': return '#000';
-      default: return '#fff';
+      case 'online':
+        return '#000';
+      case 'offline':
+        return '#fff';
+      case 'incall':
+        return '#000';
+      case 'callinitiated':
+        return '#000';
+      default:
+        return '#fff';
+    }
+  };
+
+  const formatLastSeen = lastSeen => {
+    if (!lastSeen) return 'Never';
+
+    try {
+      // Convert Firestore timestamp to JavaScript Date
+      const date = new Date(lastSeen.seconds * 1000);
+      const now = new Date();
+      const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+
+      if (diffInMinutes < 1) return 'Just now';
+      if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+
+      const diffInHours = Math.floor(diffInMinutes / 60);
+      if (diffInHours < 24) return `${diffInHours}h ago`;
+
+      const diffInDays = Math.floor(diffInHours / 24);
+      if (diffInDays < 7) return `${diffInDays}d ago`;
+
+      // For older dates, show actual date
+      return date.toLocaleDateString();
+    } catch (error) {
+      return 'Unknown';
     }
   };
 
@@ -106,14 +143,18 @@ const User = ({ statusFilter, searchTerm, navigation }) => {
     <View style={styles.userCard}>
       <View style={styles.userInfo}>
         <View style={styles.userHeader}>
-          <View style={[
-            styles.statusBadge,
-            { backgroundColor: getStatusColor(item.status || 'offline') }
-          ]}>
-            <Text style={[
-              styles.statusText,
-              { color: getStatusTextColor(item.status || 'offline') }
-            ]}>
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: getStatusColor(item.status || 'offline') },
+            ]}
+          >
+            <Text
+              style={[
+                styles.statusText,
+                { color: getStatusTextColor(item.status || 'offline') },
+              ]}
+            >
               {(item.status || 'offline').toUpperCase()}
             </Text>
           </View>
@@ -125,6 +166,11 @@ const User = ({ statusFilter, searchTerm, navigation }) => {
 
         <Text style={styles.userEmail}>
           {item.email || 'No email provided'}
+        </Text>
+
+        <Text style={styles.lastSeenText}>
+          Last seen:{' '}
+          {item.status === 'online' ? 'Online' : formatLastSeen(item.lastSeen)}
         </Text>
       </View>
 
@@ -172,9 +218,10 @@ const User = ({ statusFilter, searchTerm, navigation }) => {
         <FlatList
           data={filteredUsers}
           renderItem={renderUser}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.listContent}
+          scrollEnabled={false}
         />
       )}
     </View>
@@ -272,6 +319,12 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     fontSize: 14,
     textAlign: 'center',
+  },
+  lastSeenText: {
+    color: '#9CA3AF',
+    fontSize: 12,
+    marginTop: 2,
+    fontStyle: 'italic',
   },
 });
 
